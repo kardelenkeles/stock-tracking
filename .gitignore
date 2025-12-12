@@ -1,0 +1,14 @@
+bin/
+obj/
+app.db
+.vs/
+*.user
+*.suo
+*.db
+*.log
+*.cache
+*.pfx
+*.userprefs
+.idea/
+.vscode/
+*.DS_Store
