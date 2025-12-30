@@ -87,13 +87,13 @@ namespace Project.UI.Forms
  private void LoadData()
  {
  var list = _stockService.GetAll().ToList();
- // filter by date
+ 
  var from = dtFrom.Value.Date;
  var to = dtTo.Value.Date.AddDays(1).AddSeconds(-1);
  list = list.Where(m => m.MovementDate >= from && m.MovementDate <= to).ToList();
- // filter by product name
+ 
  if (!string.IsNullOrWhiteSpace(txtProduct.Text)) list = list.Where(m => (_productService.GetById(m.ProductId)?.Name ?? string.Empty).Contains(txtProduct.Text.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
- // filter by type
+ 
  if (cbType.SelectedItem is string t && t != "All") list = list.Where(m => m.MovementType == t).ToList();
 
  dgv.DataSource = list;

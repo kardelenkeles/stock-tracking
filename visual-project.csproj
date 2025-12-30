@@ -7,6 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +16,11 @@
     <PackageReference Include="ClosedXML" Version="0.104.0" />
     <PackageReference Include="PdfSharpCore" Version="1.3.36" />
     <PackageReference Include="System.Windows.Forms.DataVisualization" Version="1.0.0-prerelease.20110.1" />
+  </ItemGroup>
+
+  <!-- exclude seed tool source files from compilation in main project -->
+  <ItemGroup>
+    <Compile Remove="SeedTool\**\*.cs" />
   </ItemGroup>
 
 </Project>

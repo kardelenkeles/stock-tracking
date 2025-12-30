@@ -6,7 +6,7 @@ namespace Project.Core.Models
  {
  public int Id { get; set; }
  public int ProductId { get; set; }
- public string MovementType { get; set; } = null!; // "IN" or "OUT"
+ public string MovementType { get; set; } = null!; 
  public int Quantity { get; set; }
  public DateTime MovementDate { get; set; }
  public int? UserId { get; set; }

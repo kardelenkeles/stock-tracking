@@ -8,12 +8,12 @@ namespace Project.Services
  public class ProductService
  {
  private readonly ProductRepository _repo;
+ private readonly StockMovementRepository _movementRepo;
  private readonly ActivityLogService? _log;
- public ProductService(ProductRepository repo, ActivityLogService? log = null) => (_repo, _log) = (repo, log);
+ public ProductService(ProductRepository repo, StockMovementRepository movementRepo, ActivityLogService? log = null) => (_repo, _movementRepo, _log) = (repo, movementRepo, log);
 
  public IEnumerable<Product> GetAll() => _repo.GetAll();
  public Product? GetById(int id) => _repo.GetById(id);
-
  public void Create(Product p, User? performedBy = null)
  {
  if (performedBy != null && performedBy.Role != "Admin") throw new UnauthorizedAccessException("Only Admins can create products.");
@@ -37,9 +37,17 @@ namespace Project.Services
  public void Delete(int id, User? performedBy = null)
  {
  if (performedBy != null && performedBy.Role != "Admin") throw new UnauthorizedAccessException("Only Admins can delete products.");
+ var moves = _movementRepo.CountByProduct(id);
+ if (moves >0) throw new InvalidOperationException("Cannot delete product with stock movements.");
  _repo.Delete(id);
  _log?.Log(performedBy?.Id, "DELETE", "Product", id, null);
  }
  public void UpdateQuantity(int productId, int newQuantity) => _repo.UpdateQuantity(productId, newQuantity);
+
+
+ public bool HasMovements(int productId)
+ {
+ return _movementRepo.CountByProduct(productId) >0;
+ }
  }
 }

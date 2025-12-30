@@ -43,19 +43,42 @@ namespace Project.Reports
  public void ExportCriticalStockToPdf(string filePath)
  {
  var products = _productService.GetAll().Where(p => p.Quantity <= p.MinQuantity).ToList();
+ Console.WriteLine($"Critical products count: {products.Count}"); 
  using var doc = new PdfDocument();
  var page = doc.AddPage();
  var gfx = XGraphics.FromPdfPage(page);
- var font = new XFont("Verdana",10);
+ var titleFont = new XFont("Verdana",14, XFontStyle.Bold);
+ var headerFont = new XFont("Verdana",10, XFontStyle.Bold);
+ var contentFont = new XFont("Verdana",10);
  double y =20;
- gfx.DrawString("Critical Stock Report", new XFont("Verdana",14, XFontStyle.Bold), XBrushes.Black, new XRect(0, y, page.Width,20), XStringFormats.TopCenter);
- y +=30;
- foreach(var p in products)
- {
- var line = $"{p.Id} - {p.Name} - Qty: {p.Quantity} - Min: {p.MinQuantity}";
- gfx.DrawString(line, font, XBrushes.Black, new XRect(20, y, page.Width-40,20), XStringFormats.TopLeft);
+
+ gfx.DrawString("Critical Stock Report", titleFont, XBrushes.Black, new XRect(0, y, page.Width,20), XStringFormats.TopCenter);
+ y +=40;
+
+ 
+ gfx.DrawString("Id", headerFont, XBrushes.Black, new XRect(20, y,40,20), XStringFormats.TopLeft);
+ gfx.DrawString("Name", headerFont, XBrushes.Black, new XRect(70, y,150,20), XStringFormats.TopLeft);
+ gfx.DrawString("Quantity", headerFont, XBrushes.Black, new XRect(230, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString("MinQuantity", headerFont, XBrushes.Black, new XRect(320, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString("CategoryId", headerFont, XBrushes.Black, new XRect(410, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString("SupplierId", headerFont, XBrushes.Black, new XRect(500, y,80,20), XStringFormats.TopLeft);
  y +=20;
- if (y > page.Height -40) { page = doc.AddPage(); gfx = XGraphics.FromPdfPage(page); y =20; }
+
+ foreach (var p in products)
+ {
+ if (y > page.Height -40)
+ {
+ page = doc.AddPage();
+ gfx = XGraphics.FromPdfPage(page);
+ y =20;
+ }
+ gfx.DrawString(p.Id.ToString(), contentFont, XBrushes.Black, new XRect(20, y,40,20), XStringFormats.TopLeft);
+ gfx.DrawString(p.Name, contentFont, XBrushes.Black, new XRect(70, y,150,20), XStringFormats.TopLeft);
+ gfx.DrawString(p.Quantity.ToString(), contentFont, XBrushes.Black, new XRect(230, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString(p.MinQuantity.ToString(), contentFont, XBrushes.Black, new XRect(320, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString(p.CategoryId.ToString(), contentFont, XBrushes.Black, new XRect(410, y,80,20), XStringFormats.TopLeft);
+ gfx.DrawString(p.SupplierId.ToString(), contentFont, XBrushes.Black, new XRect(500, y,80,20), XStringFormats.TopLeft);
+ y +=20;
  }
  doc.Save(filePath);
  }

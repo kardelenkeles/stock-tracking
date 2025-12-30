@@ -24,6 +24,7 @@ namespace Project.UI.Forms
  private Button btnStock = new Button();
  private Button btnReports = new Button();
  private Button btnUsers = new Button();
+ private Button btnLogout = new Button();
  private Label lblUserInfo = new Label();
 
  public MainForm(User user, CategoryService catService, SupplierService supService, ProductService prodService, StockService stockService, ReportService reportService)
@@ -52,27 +53,28 @@ namespace Project.UI.Forms
  btnStock.Text = "Stock Movements"; btnStock.Left =10; btnStock.Top =180; btnStock.Width =180; btnStock.Click += (s,e)=> OpenStock();
  btnReports.Text = "Reports"; btnReports.Left =10; btnReports.Top =220; btnReports.Width =180; btnReports.Click += (s,e)=> OpenReports();
  btnUsers.Text = "Users"; btnUsers.Left =10; btnUsers.Top =300; btnUsers.Width =180; btnUsers.Click += (s,e)=> OpenUsers();
+ btnLogout.Text = "Logout"; btnLogout.Left =10; btnLogout.Top =340; btnLogout.Width =180; btnLogout.Click += (s,e)=> { this.Close(); };
 
  lblUserInfo.Left =10; lblUserInfo.Top =260; lblUserInfo.Width =180; lblUserInfo.Text = $"User: {_currentUser.Username} ({_currentUser.Role})";
 
- navPanel.Controls.Add(btnDashboard); navPanel.Controls.Add(btnProducts); navPanel.Controls.Add(btnCategories); navPanel.Controls.Add(btnSuppliers); navPanel.Controls.Add(btnStock); navPanel.Controls.Add(btnReports); navPanel.Controls.Add(btnUsers); navPanel.Controls.Add(lblUserInfo);
+ navPanel.Controls.Add(btnDashboard); navPanel.Controls.Add(btnProducts); navPanel.Controls.Add(btnCategories); navPanel.Controls.Add(btnSuppliers); navPanel.Controls.Add(btnStock); navPanel.Controls.Add(btnReports); navPanel.Controls.Add(btnUsers); navPanel.Controls.Add(btnLogout); navPanel.Controls.Add(lblUserInfo);
 
  this.Controls.Add(navPanel); this.Controls.Add(contentPanel);
 
- // role-based visibility
  btnUsers.Visible = _currentUser.Role == "Admin";
- // make Categories and Suppliers admin-only
+
  btnCategories.Visible = _currentUser.Role == "Admin";
  btnSuppliers.Visible = _currentUser.Role == "Admin";
  btnProducts.Visible = _currentUser.Role == "Admin" || _currentUser.Role == "User";
  btnStock.Visible = true;
  btnReports.Visible = _currentUser.Role == "Admin";
+ btnLogout.Visible = true;
  }
 
  private void ShowDashboard()
  {
  contentPanel.Controls.Clear();
- var dashboard = new DashboardControl(_catService, _prodService, _stockService);
+ var dashboard = new DashboardControl(_catService, _prodService, _stockService, _supService);
  contentPanel.Controls.Add(dashboard);
  }
 
@@ -126,7 +128,8 @@ namespace Project.UI.Forms
  var userRepo = new Project.Data.UserRepository(Project.Data.Database.ConnectionString);
  var activityRepo = new Project.Data.ActivityLogRepository(Project.Data.Database.ConnectionString);
  var activityService = new ActivityLogService(activityRepo);
- var userService = new UserService(userRepo, activityService);
+ var movementRepo = new Project.Data.StockMovementRepository(Project.Data.Database.ConnectionString);
+ var userService = new UserService(userRepo, activityService, movementRepo);
  var form = new UserListForm(userService, _currentUser.Id);
  form.TopLevel = false; form.FormBorderStyle = FormBorderStyle.None; form.Dock = DockStyle.Fill;
  contentPanel.Controls.Clear(); contentPanel.Controls.Add(form); form.Show();

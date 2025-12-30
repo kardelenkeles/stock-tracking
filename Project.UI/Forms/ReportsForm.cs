@@ -15,9 +15,6 @@ namespace Project.UI.Forms
  private Button btnExportPdf = new Button();
  private Button btnExportTopExcel = new Button();
  private Button btnExportTopPdf = new Button();
- private Button btnShowTop = new Button();
- private Panel pnlChart = new Panel();
- private (string name,int value)[] _chartData = Array.Empty<(string,int)>();
 
  public ReportsForm(ReportService reportService, ProductService productService)
  {
@@ -31,14 +28,15 @@ namespace Project.UI.Forms
  this.Dock = DockStyle.Fill;
  var lbl = new Label { Text = "Reports", Left =10, Top =10, AutoSize = true, Font = new Font(FontFamily.GenericSansSerif,12, FontStyle.Bold) };
  btnExportExcel.Text = "Export Critical Stock to Excel"; btnExportExcel.Left =10; btnExportExcel.Top =40; btnExportExcel.Width =240; btnExportExcel.Click += BtnExportExcel_Click;
- btnExportPdf.Text = "Export Critical Stock to PDF"; btnExportPdf.Left =260; btnExportPdf.Top =40; btnExportPdf.Width =240; btnExportPdf.Click += BtnExportPdf_Click;
- btnShowTop.Text = "Show Top Consumed"; btnShowTop.Left =520; btnShowTop.Top =40; btnShowTop.Width =140; btnShowTop.Click += BtnShowTop_Click;
- btnExportTopExcel.Text = "Export Top Consumed to Excel"; btnExportTopExcel.Left =670; btnExportTopExcel.Top =40; btnExportTopExcel.Width =200; btnExportTopExcel.Click += BtnExportTopExcel_Click;
- btnExportTopPdf.Text = "Export Top Consumed to PDF"; btnExportTopPdf.Left =880; btnExportTopPdf.Top =40; btnExportTopPdf.Width =200; btnExportTopPdf.Click += BtnExportTopPdf_Click;
+ btnExportPdf.Text = "Export Critical Stock to PDF"; btnExportPdf.Left =10; btnExportPdf.Top =80; btnExportPdf.Width =240; btnExportPdf.Click += BtnExportPdf_Click;
+ btnExportTopExcel.Text = "Export Top Consumed to Excel"; btnExportTopExcel.Left =10; btnExportTopExcel.Top =120; btnExportTopExcel.Width =240; btnExportTopExcel.Click += BtnExportTopExcel_Click;
+ btnExportTopPdf.Text = "Export Top Consumed to PDF"; btnExportTopPdf.Left =10; btnExportTopPdf.Top =160; btnExportTopPdf.Width =240; btnExportTopPdf.Click += BtnExportTopPdf_Click;
 
- pnlChart.Left =10; pnlChart.Top =80; pnlChart.Width =1100; pnlChart.Height =400; pnlChart.BorderStyle = BorderStyle.FixedSingle; pnlChart.Paint += PnlChart_Paint; this.AutoScroll = true;
-
- this.Controls.Add(lbl); this.Controls.Add(btnExportExcel); this.Controls.Add(btnExportPdf); this.Controls.Add(btnShowTop); this.Controls.Add(btnExportTopExcel); this.Controls.Add(btnExportTopPdf); this.Controls.Add(pnlChart);
+ this.Controls.Add(lbl);
+ this.Controls.Add(btnExportExcel);
+ this.Controls.Add(btnExportPdf);
+ this.Controls.Add(btnExportTopExcel);
+ this.Controls.Add(btnExportTopPdf);
  }
 
  private void BtnExportExcel_Click(object? sender, EventArgs e)
@@ -73,34 +71,5 @@ namespace Project.UI.Forms
  catch (Exception ex) { MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
  }
 
- private void BtnShowTop_Click(object? sender, EventArgs e)
- {
- var top = _reportService.GetTopConsumedProducts(10).ToList();
- _chartData = top.Select(t => (t.product.Name, t.totalOut)).ToArray();
- pnlChart.Invalidate();
- }
-
- private void PnlChart_Paint(object? sender, PaintEventArgs e)
- {
- var g = e.Graphics;
- g.Clear(Color.White);
- if (_chartData == null || _chartData.Length ==0) { g.DrawString("No data", this.Font, Brushes.Black,10,10); return; }
- int w = pnlChart.ClientSize.Width -40;
- int h = pnlChart.ClientSize.Height -40;
- int barCount = _chartData.Length;
- int barWidth = Math.Max(20, w / (barCount *2));
- int max = _chartData.Max(x => x.value);
- if (max ==0) max =1;
- for (int i=0;i<barCount;i++)
- {
- var item = _chartData[i];
- int barH = (int)((item.value / (double)max) * (h -40));
- int x =20 + i*(barWidth*2);
- int y =20 + (h - barH);
- g.FillRectangle(Brushes.SteelBlue, x, y, barWidth, barH);
- g.DrawString(item.name, new Font(this.Font.FontFamily,8), Brushes.Black, x,22 + h);
- g.DrawString(item.value.ToString(), new Font(this.Font.FontFamily,8), Brushes.Black, x, y -14);
- }
- }
  }
 }

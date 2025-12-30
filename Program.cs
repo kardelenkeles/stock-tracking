@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+
 using System;
 using System.Windows.Forms;
 using Project.UI.Forms;
@@ -15,14 +15,11 @@ namespace visual_project
             ApplicationConfiguration.Initialize();
             try
             {
-                // Initialize database and ensure tables exist
                 Database.Initialize("app.db");
 
-                // Create repositories and services
                 var userRepo = new UserRepository(Database.ConnectionString);
                 var authService = new AuthService(userRepo);
 
-                // Ensure default admin exists
                 authService.EnsureDefaultAdmin();
 
                 Application.Run(new LoginForm(authService));

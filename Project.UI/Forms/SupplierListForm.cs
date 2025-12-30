@@ -46,7 +46,7 @@ namespace Project.UI.Forms
  this.Controls.Add(btnEdit);
  this.Controls.Add(btnDelete);
 
- // disable admin actions for non-admins
+ 
  if (_currentUser == null || _currentUser.Role != "Admin") {
  btnAdd.Enabled = false; btnEdit.Enabled = false; btnDelete.Enabled = false;
  }

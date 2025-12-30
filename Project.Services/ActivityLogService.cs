@@ -16,7 +16,7 @@ namespace Project.Services
  var log = new ActivityLog { UserId = userId, Action = action, Entity = entity, EntityId = entityId, Details = details, CreatedAt = DateTime.Now };
  _repo.Add(log);
  }
- catch { /* do not throw logging errors */ }
+ catch {}
  }
  }
 }

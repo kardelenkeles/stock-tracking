@@ -21,7 +21,7 @@ namespace Project.UI.Forms
  if (user != null)
  {
  txtUsername.Text = User.Username;
- // Do not show password
+ 
  cbRole.SelectedItem = User.Role;
  }
  }

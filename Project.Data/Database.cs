@@ -14,8 +14,7 @@ namespace Project.Data
  _dbPath = dbPath;
  if (!File.Exists(_dbPath))
  {
- // Microsoft.Data.Sqlite will create file when opening connection if not exists
- // ensure directory
+
  var dir = Path.GetDirectoryName(Path.GetFullPath(_dbPath));
  if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir)) Directory.CreateDirectory(dir);
  }
@@ -24,7 +23,6 @@ namespace Project.Data
  conn.Open();
  using var cmd = conn.CreateCommand();
 
- // Users
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Users (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  Username TEXT NOT NULL UNIQUE,
@@ -33,7 +31,7 @@ namespace Project.Data
  );";
  cmd.ExecuteNonQuery();
 
- // Categories
+
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Categories (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  Name TEXT NOT NULL,
@@ -41,7 +39,7 @@ namespace Project.Data
  );";
  cmd.ExecuteNonQuery();
 
- // Suppliers
+
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Suppliers (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  Name TEXT NOT NULL,
@@ -52,7 +50,7 @@ namespace Project.Data
  );";
  cmd.ExecuteNonQuery();
 
- // Products
+
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS Products (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  Name TEXT NOT NULL,
@@ -68,7 +66,7 @@ namespace Project.Data
  );";
  cmd.ExecuteNonQuery();
 
- // StockMovements
+
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS StockMovements (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  ProductId INTEGER NOT NULL,
@@ -82,7 +80,7 @@ namespace Project.Data
  );";
  cmd.ExecuteNonQuery();
 
- // ActivityLogs
+
  cmd.CommandText = @"CREATE TABLE IF NOT EXISTS ActivityLogs (
  Id INTEGER PRIMARY KEY AUTOINCREMENT,
  UserId INTEGER,
@@ -93,6 +91,9 @@ namespace Project.Data
  CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
  FOREIGN KEY(UserId) REFERENCES Users(Id)
  );";
+ cmd.ExecuteNonQuery();
+
+            cmd.CommandText = @"UPDATE Users SET Role = 'Admin' WHERE Username = 'admin';";
  cmd.ExecuteNonQuery();
  }
  }

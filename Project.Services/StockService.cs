@@ -30,9 +30,9 @@ namespace Project.Services
  }
  public void AddMovement(StockMovement m, User? performedBy = null)
  {
- // both Admin and User can add movements, but validation applies
+
  if (m.Quantity <=0) throw new ArgumentException("Quantity must be greater than zero");
- // update product quantity
+
  var product = _productRepo.GetById(m.ProductId);
  if (product == null) throw new InvalidOperationException("Product not found");
  int newQty = product.Quantity + (m.MovementType == "IN" ? m.Quantity : -m.Quantity);

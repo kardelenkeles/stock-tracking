@@ -54,6 +54,7 @@ namespace Project.UI.Forms
  dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Purchase", DataPropertyName = "PurchasePrice", Width =100 });
  dgv.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Sell", DataPropertyName = "SellPrice", Width =100 });
  dgv.CellFormatting += Dgv_CellFormatting;
+ dgv.SelectionChanged += Dgv_SelectionChanged;
 
  btnAdd.Text = "Add"; btnAdd.Left =10; btnAdd.Top =430; btnAdd.Click += BtnAdd_Click;
  btnEdit.Text = "Edit"; btnEdit.Left =90; btnEdit.Top =430; btnEdit.Click += BtnEdit_Click;
@@ -71,13 +72,28 @@ namespace Project.UI.Forms
  this.Controls.Add(btnPrev);
  this.Controls.Add(btnNext);
 
- // Role: only Admin can add/edit/delete
+
+ 
  if (_currentUser == null || _currentUser.Role != "Admin")
  {
  btnAdd.Enabled = false;
  btnEdit.Enabled = false;
  btnDelete.Enabled = false;
  }
+ }
+
+ private void Dgv_SelectionChanged(object? sender, EventArgs e)
+ {
+ 
+ var sel = SelectedProduct();
+ if (sel == null) { btnDelete.Enabled = false; return; }
+ try
+ {
+ var has = _service.HasMovements(sel.Id);
+ 
+ btnDelete.Enabled = (_currentUser != null && _currentUser.Role == "Admin") && !has;
+ }
+ catch { btnDelete.Enabled = false; }
  }
 
  private void Dgv_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
@@ -98,7 +114,7 @@ namespace Project.UI.Forms
 
  private void LoadData()
  {
- // populate category filter only once
+ 
  if (cbCategoryFilter.Items.Count ==0)
  {
  var cats = _catService.GetAll().ToList();
@@ -109,10 +125,10 @@ namespace Project.UI.Forms
  }
 
  var list = _service.GetAll().ToList();
- // filtering
+ 
  if (!string.IsNullOrWhiteSpace(txtSearch.Text)) list = list.Where(p => p.Name.Contains(txtSearch.Text.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
  if (cbCategoryFilter.SelectedItem is Category selCat) list = list.Where(p => p.CategoryId == selCat.Id).ToList();
- // paging
+ 
  list = list.Skip((_page-1)*PageSize).Take(PageSize).ToList();
  dgv.DataSource = list;
  }
@@ -155,6 +171,7 @@ namespace Project.UI.Forms
  if (sel==null) { MessageBox.Show("Select a product","Info",MessageBoxButtons.OK,MessageBoxIcon.Information); return; }
  if (MessageBox.Show("Delete this product?","Confirm",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!= DialogResult.Yes) return;
  try { _service.Delete(sel.Id, _currentUser); LoadData(); }
+ catch (InvalidOperationException ex) { MessageBox.Show("Bu �r�n�n stok hareketleri mevcut oldu?u i�in silinemez.", "Silme Hatas?", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
  catch (Exception ex) { MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
  }
  }

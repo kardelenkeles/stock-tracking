@@ -22,16 +22,17 @@ namespace Project.UI.Forms
  private void InitializeComponents()
  {
  this.Text = "Login";
- this.Width =300;
+ this.Width =380;
  this.Height =200;
  this.FormBorderStyle = FormBorderStyle.FixedDialog;
  this.StartPosition = FormStartPosition.CenterScreen;
+ this.MaximizeBox = false;
 
- var lblUser = new Label { Text = "Username:", Left =10, Top =20 };
- txtUsername.Left =100; txtUsername.Top =20; txtUsername.Width =150;
- var lblPass = new Label { Text = "Password:", Left =10, Top =60 };
- txtPassword.Left =100; txtPassword.Top =60; txtPassword.Width =150; txtPassword.UseSystemPasswordChar = true;
- btnLogin.Text = "Login"; btnLogin.Left =100; btnLogin.Top =100;
+ var lblUser = new Label { Text = "Username:", Left =20, Top =30, Width =70, TextAlign = System.Drawing.ContentAlignment.MiddleLeft };
+ txtUsername.Left =100; txtUsername.Top =25; txtUsername.Width =240;
+ var lblPass = new Label { Text = "Password:", Left =20, Top =70, Width =70, TextAlign = System.Drawing.ContentAlignment.MiddleLeft };
+ txtPassword.Left =100; txtPassword.Top =65; txtPassword.Width =240; txtPassword.UseSystemPasswordChar = true;
+ btnLogin.Text = "Login"; btnLogin.Left =240; btnLogin.Top =110; btnLogin.Width =100;
  btnLogin.Click += BtnLogin_Click;
 
  this.Controls.Add(lblUser);
@@ -39,6 +40,8 @@ namespace Project.UI.Forms
  this.Controls.Add(lblPass);
  this.Controls.Add(txtPassword);
  this.Controls.Add(btnLogin);
+
+ this.AcceptButton = btnLogin;
  }
 
  private void BtnLogin_Click(object? sender, EventArgs e)
@@ -49,10 +52,12 @@ namespace Project.UI.Forms
  if (user == null)
  {
  MessageBox.Show("Invalid credentials", "Login failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+ txtPassword.Clear();
+ txtPassword.Focus();
  return;
  }
 
- // Create repositories and services to pass to main form
+
  var conn = Database.ConnectionString;
  var catRepo = new CategoryRepository(conn);
  var supRepo = new SupplierRepository(conn);
@@ -61,17 +66,21 @@ namespace Project.UI.Forms
  var activityRepo = new ActivityLogRepository(conn);
 
  var activityService = new ActivityLogService(activityRepo);
- var catService = new CategoryService(catRepo, prodRepo);
+ var catService = new CategoryService(catRepo, prodRepo, activityService);
  var supService = new SupplierService(supRepo, prodRepo, activityService);
- var prodService = new ProductService(prodRepo);
- var stockService = new StockService(movRepo, prodRepo);
+ var prodService = new ProductService(prodRepo, movRepo, activityService);
+ var stockService = new StockService(movRepo, prodRepo, activityService);
  var reportService = new Project.Reports.ReportService(stockService, prodService);
 
- // Open main form
- var main = new MainForm(user, catService, supService, prodService, stockService, reportService);
+
  this.Hide();
+ var main = new MainForm(user, catService, supService, prodService, stockService, reportService);
  main.ShowDialog();
- this.Close();
+
+ this.Show();
+ 
+ txtPassword.Clear();
+ txtPassword.Focus();
  }
  catch (Exception ex)
  {

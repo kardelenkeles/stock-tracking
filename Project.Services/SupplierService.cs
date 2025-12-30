@@ -45,7 +45,6 @@ namespace Project.Services
  private static bool IsValidEmail(string email)
  {
  if (string.IsNullOrWhiteSpace(email)) return false;
- // simple RFC-like pattern
  try
  {
  var pattern = @"^[^\s@]+@[^\s@]+\.[^\s@]+$";
@@ -57,7 +56,6 @@ namespace Project.Services
  private static bool IsValidPhone(string phone)
  {
  if (string.IsNullOrWhiteSpace(phone)) return false;
- // Allow digits, spaces, hyphens, parentheses and leading +; require at least7 digits
  var cleaned = Regex.Replace(phone, "[^0-9]", "");
  if (cleaned.Length <7 || cleaned.Length >15) return false;
  var pattern = @"^\+?[0-9\- ()]+$";
